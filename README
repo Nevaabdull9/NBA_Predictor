@@ -1,2 +1,64 @@
-This project uses historical NBA player statistics to build a Linear Regression machine learning model that predicts how many points per game a player is expected to score.
+# NBA Player Stats Predictor (xStats Model)
 
+This project uses machine learning to predict an NBA player's performance (Points, Rebounds, Assists) in their next game. It combines historical data, current season opportunity metrics, recent games, and opponent defensive ratings to generate "Expected Stats" (xStats).
+
+## Model & Training Data
+
+The model is built using **Linear Regression** (Scikit-Learn) and is trained on the following data sources:
+
+### 1. Data Sources
+*   **2025-2026 NBA Player Stats:** Current season performance (Top 150 players based on ppg).
+*   **2024-2025 NBA Player Stats:** Previous season performance (used as a baseline for stats).
+*   **NBA Team Defense Ratings:** Used to adjust predictions based on the opponent's defensive rating(Lower defensive rating=tough matchup, higher defensive rating =easier matchup).
+*   **Last 7 Games Logs:** Last 7 game logs of the top 150 players(based on ppg)
+
+### 2. Feature Engineering
+The model predicts stats based on three key factors:
+1.  **Opportunity:** Minutes per Game (MpG), Usage Rate (USG%).
+2.  **History(stats):** Previous season's Points, Rebounds, Assists, True Shooting % (TS%), and Effective Field Goal % (eFG%).
+3.  **Recent Form:** Average stats over the last 7 games.
+
+### 3. Prediction Logic
+*   **Base Prediction:** The Linear Regression model calculates a baseline "Expected Stat" (e.g., xPoints) using the features above.
+*   **Defense Adjustment:** This baseline is multiplied by a **Defense Factor** (Opponent DRtg / League Avg DRtg).
+    *   Bad defense (High Defensive rating) -> Prediction increases.
+    *   Good Defense (Low Defensive rating) -> Prediction decreases.
+
+---
+
+## How to Run the Project
+
+### Prerequisites
+*   Python 3.x
+*   Required libraries (install via pip):
+    pip install -r requirements.txt
+
+
+### Step 1: Train the Model
+The model logic is contained in the Jupyter Notebook `NBAModel.ipynb`.
+1.  Open `NBAModel.ipynb` in VS Code or Jupyter.
+2.  Run all cells.
+3.  This will process the CSV files, train the Linear Regression models, and save the trained artifacts to `nba_model_data.joblib`.
+
+### Step 2: Run the Web Application
+The web interface is built with **Flask**.
+1.  Open a terminal in the project folder.
+2.  Run the app:
+    python app.py
+
+### Step 3: Use the Predictor
+1.  **Select a Player:** Choose from the top 150 players in the dropdown.
+2.  **Select an Opponent:** Choose the team they are playing against.
+3.  **View Results:**
+    *   **Predicted Stats:** Points, Rebounds, and Assists for the next game.
+    *   **Matchup :** See if the matchup is Favorable (Green), Neutral (Yellow), or Tough (Red).
+    *   **Graph:** Visualize the player's performance over their last 7 games.
+
+---
+
+##  File Structure
+*   `app.py`: The Flask web server.
+*   `NBAModel.ipynb`: Notebook for data cleaning, feature engineering, and model training.
+*   `nba_model_data.joblib`: Saved model and data used by the app.
+*   `templates/index.html`: The frontend HTML/CSS/JS for the web app.
+*   `*.csv`: Raw data files for stats and game logs.
